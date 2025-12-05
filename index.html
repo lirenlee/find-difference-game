@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>森林不見了？AI 來找碴</title>
+    <style>
+        /* 取消背景圖片，改為柔和綠色背景 */
+        body {
+            font-family: '微軟正黑體', sans-serif;
+            background-image: none;
+            background-color: #b8e4bf; /* 柔和綠色 */
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        h1 { margin-bottom: 10px; }
+        
+        /* 遊戲主要容器 */
+        .game-container {
+            position: relative; /* 關鍵：讓紅圈圈可以相對於這張圖定位 */
+            display: inline-block; /* 讓容器大小剛好包住圖片 */
+            max-width: 100%; /* 確保不超過螢幕寬度 */
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        /* 初始隱藏遊戲畫面，直到按下開始 */
+        .game-container.hidden { display: none; }
+
+        /* 說明遮罩 */
+        #intro-overlay{
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        /* 讓說明框半透明，能看到背景圖 */
+        #intro-box{
+            max-width: 800px;
+            background: rgba(17,17,17,0.75); /* 半透明黑 */
+            border-radius: 8px;
+            padding: 24px;
+            text-align: left;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            color: #fff;
+        }
+        #start-btn{
+            display: block;
+            margin: 12px auto 0;   /* 置中按鈕 */
+            width: 200px;          /* 按鈕容器寬度（容器大小） */
+            height: 90px;          /* 按鈕容器高度（容器大小） */
+            transform: translate(0px, 10px); /* 微調按鈕位置 向右 20px、向下 10px */
+            padding: 0;            /* 圖片用 margin 調整位置，按鈕不留內邊距 */
+            background: transparent;
+            border: none;
+            border-radius: 16px;
+            position: relative;
+            cursor: pointer;
+            overflow: visible;
+        }
+
+        /* 按鈕內的圖片放在最上層 */
+        .start-img {
+            position: relative;
+            z-index: 2;
+            max-width: 200px; /* 圖片最大寬度（可調） */
+            height: auto;
+            display: block;
+            pointer-events: none; /* 點擊會傳給按鈕本身 */
+            margin: 30px auto 0;   /* 用 margin-top 調整圖片在按鈕內的垂直位置 */
+            transform: translate(0px, -100px); /* 調整圖片在按鈕內的視覺位置（可改數值） */
+        }
+
+        /* 過關畫面 */
+        #end-overlay{
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.9);
+            z-index: 10000;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        /* 過關框也用半透明背景 */
+        #end-box{
+            max-width: 700px;
+            background: rgba(17,17,17,0.85);
+            color: #fff;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 12px 36px rgba(0,0,0,0.7);
+        }
+        /* 過關圖片樣式 */
+        #end-image{
+            display: block;
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+            margin: 0 auto;
+        }
+         #restart-btn{
+            margin-top: 14px;
+            padding: 16px 32px;   /* ↑上下、左右內距決定整體大小 */
+            font-size: 30px;      /* 文字大小 */
+            min-width: 220px;     /* 可加固定寬度 */
+            background: #87e69d;
+            color: #161515;
+            border: none;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* 圖片設定：調整顯示大小（示範：寬不超過 800px，或改成你要的值） */
+        #game-img {
+            display: block;
+            width: 1200px;       /* 要改變顯示大小就修改這裡（例：800px） */
+            max-width: 90vw;    /* 手機或小視窗時限制寬度 */
+            height: auto;
+            cursor: crosshair;  /* 滑鼠游標變成十字 */
+        }
+
+        /* 紅圈圈樣式 */
+        .circle {
+            position: absolute;
+            width: 50px;  /* 圈圈大一點比較明顯 */
+            height: 50px;
+            border: 4px solid #ff0000;
+            border-radius: 50%;
+            transform: translate(-50%, -50%); /* 讓座標點位於圈圈中心 */
+            pointer-events: none; /* 讓點擊穿透圈圈 */
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.9);
+            animation: pop 0.3s ease-out; /* 彈出動畫 */
+        }
+
+        /* 簡單的彈出動畫 */
+        @keyframes pop {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            80% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        #status {
+            margin-top: 15px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffcc00;
+            min-height: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 遊戲說明畫面（預設顯示） -->
+    <div id="intro-overlay">
+        <div id="intro-box">
+              <img src="遊戲素材-20251201T031617Z-1-001\遊戲素材\遊戲說明-fin.jpg" alt="" style="max-width: 100%;">
+              <!-- 若保留占位元素則隱藏並移除 alt 文字 -->
+              <img id="intro-img" src="" alt="" style="display:none;">
+             <!-- 把 StartButton.png 放到專案對應資料夾（或改路徑） -->
+             <button id="start-btn" aria-label="遊戲開始">
+                 <img class="start-img" src="./遊戲素材-20251201T031617Z-1-001/遊戲素材/StartButton.png" alt="遊戲開始圖">
+             </button>
+        </div>
+    </div>
+
+    <span id="found-count" style="display:none">0</span>
+    <!-- 預設隱藏 game-area，按下開始才顯示 -->
+    <div class="game-container hidden" id="game-area">
+        <img src="./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/20.png" id="game-img" alt="大家來找碴遊戲圖">
+    </div>
+
+    <div id="status"></div>
+
+    <!-- 過關畫面 -->
+    <div id="end-overlay">
+        <div id="end-box">
+            <!-- 改成顯示圖片 + 再玩一次按鈕（請修改圖片路徑） -->
+            <img id="end-image" src="遊戲素材-20251201T031617Z-1-001\遊戲素材\遊戲結語.JPG" alt="過關圖片">
+            <button id="restart-btn">再玩一次</button>
+        </div>
+    </div>
+
+    <!-- 背景音樂（把 bg.mp3 放到 ./audio/ 底下，或修改路徑） -->
+    <audio id="bg-music" src="遊戲素材-20251201T031617Z-1-001\遊戲素材\bgm&音效\遊戲bgm.mp3" loop preload="auto"></audio>
+    <!-- 音效：start / correct / wrong / end（把檔案放到 ./audio/ 資料夾） -->
+    <audio id="sfx-start" src="遊戲素材-20251201T031617Z-1-001\遊戲素材\bgm&音效\點擊按鈕音效.mp3" preload="auto"></audio>
+    <audio id="sfx-correct" src="遊戲素材-20251201T031617Z-1-001\遊戲素材\bgm&音效\答對音效.mp3" preload="auto"></audio>
+    <audio id="sfx-wrong" src="遊戲素材-20251201T031617Z-1-001\遊戲素材\bgm&音效\答錯音效.mp3" preload="auto"></audio>
+    <audio id="sfx-end" src="遊戲素材-20251201T031617Z-1-001/遊戲素材/bgm&音效/森林恢復音效.mp3" preload="auto"></audio>
+ 
+    
+
+    <script>
+        // 範例：用 JS 設定背景縮放（可放在適當位置）
+        // 設為 120%（寬度），高度自動
+        // document.documentElement.style.setProperty('--bg-size', '120%');
+        // 或改回 cover:
+        // document.documentElement.style.setProperty('--bg-size', 'cover');
+
+        // 若想提供即時控制（開發用），可在 console 執行：
+        // document.documentElement.style.setProperty('--bg-size', '140%');
+
+        const bgMusic = document.getElementById('bg-music');
+        const sfxStart = document.getElementById('sfx-start');
+        const sfxCorrect = document.getElementById('sfx-correct');
+        const sfxWrong = document.getElementById('sfx-wrong');
+        const sfxEnd = document.getElementById('sfx-end');
+
+        // 預設音量（0.0 ~ 1.0）
+        bgMusic.volume = 0.5;      // 背景音 30%
+        sfxStart.volume = 0.6;     // 開始音 80%
+        sfxCorrect.volume = 0.2;   // 答對音 90%
+        sfxWrong.volume = 0.3;     // 答錯音 90%
+        sfxEnd.volume = 0.3;       // 過關音 90%
+
+         
+
+        // --- 圖片與座標：從外部 JSON 載入（differences 保持原始像素座標） ---
+        let gameImages = [];
+
+        async function loadGameImages() {
+            try {
+                const res = await fetch('./data/gameImages.json', { cache: "no-store" });
+                if (!res.ok) throw new Error('載入 data/gameImages.json 失敗: ' + res.status);
+                gameImages = await res.json();
+                console.log('gameImages 載入完成，張數:', gameImages.length);
+                // 載入完成後啟動第一回合（顯示說明）
+                initNewRound(true);
+            } catch (err) {
+                console.error(err);
+                // fallback：若載入失敗，維持原本單張或提醒
+                alert('載入遊戲資料失敗，請確認 data/gameImages.json 是否存在於專案中。');
+            }
+        }
+
+        function getRandomImage() {
+            const randomIndex = Math.floor(Math.random() * gameImages.length);
+            return gameImages[randomIndex];
+        }
+
+        // 動態管理當前回合
+        let selectedImage = null;
+        let differences = [];
+        // 容許誤差（以原始圖片像素為單位）預設改為 120（可用下方 slider 微調）
+        let tolerance = 120;
+        let foundCount = 0;
+        let totalCount = 0;
+
+        // --- 遊戲邏輯 ---
+
+        const gameArea = document.getElementById('game-area');
+        const gameImg = document.getElementById('game-img');
+        const statusText = document.getElementById('status');
+        const countText = document.getElementById('found-count');
+
+        const introOverlay = document.getElementById('intro-overlay');
+        let startBtn = document.getElementById('start-btn');
+        const endOverlay = document.getElementById('end-overlay');
+        const restartBtn = document.getElementById('restart-btn');
+
+        // 控制遊戲是否已開始
+        let gameStarted = false;
+
+        // 確認圖片載入狀態：避免在 naturalWidth 為 0 時開始遊戲
+        let imageReady = false;
+        gameImg.addEventListener('load', () => {
+            imageReady = true;
+            console.log('game image loaded', gameImg.naturalWidth, gameImg.naturalHeight);
+            if (startBtn) startBtn.disabled = false;
+            if (statusText) statusText.textContent = '';
+        });
+
+        // 初始化一個新回合（選圖、重置資料）
+        function initNewRound(showIntro = true) {
+             selectedImage = getRandomImage();
+             console.log('initNewRound -> selectedImage:', selectedImage && selectedImage.name);
+             differences = JSON.parse(JSON.stringify(selectedImage.differences || []));
+             console.log('differences (count):', differences.length, differences.slice(0,3));
+              foundCount = 0;
+              totalCount = differences.length;
+              countText.textContent = foundCount;
+              statusText.textContent = '';
+              // 移除畫面上既有的圈圈
+              document.querySelectorAll('.circle').forEach(n => n.remove());
+              // 設定圖片 src（瀏覽器會快取）
+              gameImg.src = selectedImage.name;
+              // 隱藏遊戲區或顯示說明視窗
+              gameArea.classList.add('hidden');
+              gameStarted = false;
+              if (showIntro) {
+                  introOverlay.style.display = 'flex';
+              } else {
+                  introOverlay.style.display = 'none';
+                  gameArea.classList.remove('hidden');
+              }
+          }
+ 
+         // 開始按鈕（說明視窗）
+         startBtn.addEventListener('click', () => {
+            // 如果圖片已載入，直接開始
+            if (imageReady) {
+                introOverlay.style.display = 'none';
+                gameArea.classList.remove('hidden');
+                gameStarted = true;
+                if (sfxStart) { sfxStart.currentTime = 0; sfxStart.play().catch(()=>{}); }
+                if (bgMusic) { bgMusic.play().catch(() => {}); }
+                return;
+            }
+            // 尚未載入：顯示提示並在載入完成後自動開始
+            if (statusText) statusText.textContent = '圖片載入中，載入完成會自動開始...';
+            if (startBtn) startBtn.disabled = true;
+            const onImgLoad = () => {
+                if (startBtn) startBtn.disabled = false;
+                if (statusText) statusText.textContent = '';
+                introOverlay.style.display = 'none';
+                gameArea.classList.remove('hidden');
+                gameStarted = true;
+                if (sfxStart) { sfxStart.currentTime = 0; sfxStart.play().catch(()=>{}); }
+                if (bgMusic) { bgMusic.play().catch(() => {}); }
+                gameImg.removeEventListener('load', onImgLoad);
+            };
+            gameImg.addEventListener('load', onImgLoad);
+         });
+ 
+         // 再玩一次按鈕（過關視窗）
+         restartBtn.addEventListener('click', () => {
+             endOverlay.style.display = 'none';
+             // 開始新的回合，顯示說明讓玩家按開始（可改成直接開始）
+             initNewRound(true);
+             if (sfxStart) { sfxStart.currentTime = 0; sfxStart.play().catch(()=>{}); }
+         });
+ 
+         // 點擊事件監聽
+         gameImg.addEventListener('click', function(e) {
+            if (!gameStarted) return;
+ 
+            // 取得顯示區塊與原始尺寸
+            const rect = gameImg.getBoundingClientRect();
+            const naturalW = gameImg.naturalWidth;
+            const naturalH = gameImg.naturalHeight;
+ 
+            // 顯示 / 原始 的縮放比（x,y 各自計算以處理非等比縮放）
+            const ratioX = rect.width / naturalW;
+            const ratioY = rect.height / naturalH;
+ 
+            // 取得點擊在顯示座標（px）
+            const clickDisplayX = e.clientX - rect.left;
+            const clickDisplayY = e.clientY - rect.top;
+ 
+            // 還原成原始圖片座標（natural image 的座標系）
+            const clickX = clickDisplayX / ratioX;
+            const clickY = clickDisplayY / ratioY;
+            console.log(`座標紀錄: x: ${Math.round(clickX)}, y: ${Math.round(clickY)}`);
+ 
+            let hit = false;
+ 
+            // 逐一比對並記錄距離（方便除錯）
+            differences.forEach((diff, idx) => {
+                if (diff.found) return;
+                const dist = Math.hypot(clickX - diff.x, clickY - diff.y);
+                console.log(`diff[${idx}] = (${diff.x},${diff.y}) dist=${Math.round(dist)}`);
+                // tolerance 是以原始圖片像素為單位（不用乘 ratio）
+                if (dist < tolerance) {
+                    hit = true;
+                    diff.found = true;
+                    foundCount++;
+                    countText.textContent = foundCount;
+                    // 畫圈時把原始座標轉回顯示座標
+                    drawCircle(diff.x, diff.y, ratioX, ratioY);
+                    if (sfxCorrect) { sfxCorrect.currentTime = 0; sfxCorrect.play().catch(()=>{}); }
+                    if (foundCount === totalCount) {
+                        showEndOverlay();
+                    }
+                }
+            });
+ 
+             if (!hit && foundCount < totalCount) {
+ 
+                console.log("沒點中...");
+                if (sfxWrong) { sfxWrong.currentTime = 0; sfxWrong.play().catch(()=>{}); }
+             }
+         });
+ 
+         function showEndOverlay() {
+              // 隱藏遊戲區、顯示過關畫面
+              gameArea.classList.add('hidden');
+              endOverlay.style.display = 'flex';
+             // 播放過關音效（可選暫停背景音樂）
+             if (sfxEnd) { sfxEnd.currentTime = 0; sfxEnd.play().catch(()=>{}); }
+         }
+ 
+        function drawCircle(origX, origY, ratioX, ratioY) {
+            const circle = document.createElement('div');
+            circle.classList.add('circle');
+            // 把原始座標換算成顯示座標
+            const displayX = origX * ratioX;
+            const displayY = origY * ratioY;
+            circle.style.left = displayX + 'px';
+            circle.style.top = displayY + 'px';
+            gameArea.appendChild(circle);
+        }
+
+        // 頁面載入時先載入 data/gameImages.json 再初始化回合
+        loadGameImages();
+    </script>
+</body>
+</html>

@@ -1,0 +1,284 @@
+// ...existing code...
+    <script>
+        // --- 圖片與座標設定區 ---
+        
+        const gameImages = [
+            {
+                name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/1.png',
+                differences: [
+                    { x: 1065, y: 603, found: false },
+                    { x: 1248, y: 707, found: false },
+                    { x: 1094, y: 854, found: false },
+                    { x: 1351, y: 866, found: false },
+                    { x: 1542, y: 821, found: false }
+                ]
+            },
+            {
+                name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/2.png',
+                differences: [
+                    { x: 1341, y: 830, found: false },
+                    { x: 1086, y: 798, found: false },
+                    { x: 1241, y: 664, found: false },
+                    { x: 1078, y: 569, found: false },
+                    { x: 1258, y: 939, found: false }
+                ]
+            },
+            {
+                name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/3.png',
+                differences: [
+                    { x: 1642, y: 581, found: false },
+                    { x: 1647, y: 780, found: false },
+                    { x: 1485, y: 885, found: false },
+                    { x: 1141, y: 791, found: false },
+                    { x: 1086, y: 602, found: false }
+                ]
+            },
+            {
+                name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/4.png',
+                differences: [
+                    { x: 1609, y: 668, found: false },
+                    { x: 1290, y: 759, found: false },
+                    { x: 1080, y: 698, found: false },
+                    { x: 1119, y: 881, found: false },
+                    { x: 1563, y: 863, found: false }
+                ]
+            },
+            {
+                name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/5.png',
+                differences: [
+                    { x: 1496, y: 862, found: false },
+                    { x: 1374, y: 956, found: false },
+                    { x: 1302, y: 718, found: false },
+                    { x: 1145, y: 831, found: false },
+                    { x: 1117, y: 693, found: false }
+                ]
+            },
+            {
+                name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/6.png',
+                differences: [
+                    { x: 1586, y: 775, found: false },
+                    { x: 1646, y: 549, found: false },
+                    { x: 1254, y: 701, found: false },
+                    { x: 1069, y: 572, found: false },
+                    { x: 1117, y: 805, found: false }
+                ]
+            },
+            {
+                name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/7.png',
+                differences: [
+                    { x: 1561, y: 856, found: false },
+                    { x: 1435, y: 971, found: false },
+                    { x: 1331, y: 845, found: false },
+                    { x: 1139, y: 941, found: false },
+                    { x: 1065, y: 594, found: false }
+                ]
+            },
+            {
+                name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/8.png',
+                differences: [
+                    { x: 1139, y: 860, found: false },
+                    { x: 1287, y: 686, found: false },
+                    { x: 1261, y: 952, found: false },
+                    { x: 1494, y: 956, found: false },
+                    { x: 1546, y: 812, found: false }
+                ]
+            },
+            {
+                name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/9.png',
+                differences: [
+                    { x: 1524, y: 801, found: false },
+                    { x: 1642, y: 904, found: false },
+                    { x: 1095, y: 842, found: false },
+                    { x: 1646, y: 716, found: false },
+                    { x: 1435, y: 967, found: false }
+                ]
+            },
+            {
+                name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/10.png',
+                differences: [
+                    { x: 1069, y: 897, found: false },
+                    { x: 1169, y: 749, found: false },
+                    { x: 1398, y: 842, found: false },
+                    { x: 1501, y: 923, found: false },
+                    { x: 1272, y: 938, found: false }
+                ]
+            },
+            {
+                name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/11.png',
+                differences: [
+                    { x: 1538, y: 805, found: false },
+                    { x: 1102, y: 827, found: false },
+                    { x: 1649, y: 908, found: false },
+                    { x: 1312, y: 723, found: false },
+                    { x: 1453, y: 967, found: false }
+                ]
+            },
+            {
+                name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/12.png',
+                differences: [
+                    { x: 1080, y: 904, found: false },
+                    { x: 1054, y: 753, found: false },
+                    { x: 1524, y: 882, found: false },
+                    { x: 1671, y: 853, found: false },
+                    { x: 1206, y: 978, found: false }
+                ]
+            },
+            {
+                name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/13.png',
+                differences: [
+                    { x: 1183, y: 749, found: false },
+                    { x: 1217, y: 919, found: false },
+                    { x: 1405, y: 975, found: false },
+                    { x: 1420, y: 834, found: false },
+                    { x: 1538, y: 923, found: false }
+                ]
+            },
+            {
+                name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/14.png',
+                differences: [
+                    { x: 1561, y: 819, found: false },
+                    { x: 1520, y: 956, found: false },
+                    { x: 1224, y: 734, found: false },
+                    { x: 1061, y: 638, found: false },
+                    { x: 1631, y: 616, found: false }
+                ]
+            },
+            {
+                name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/15.png',
+                differences: [
+                    { x: 1191, y: 642, found: false },
+                    { x: 1065, y: 745, found: false },
+                    { x: 1065, y: 520, found: false },
+                    { x: 1420, y: 964, found: false },
+                    { x: 1109, y: 860, found: false }
+                ]
+            },
+            {
+                name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/16.png',
+                differences: [
+                    { x: 1109, y: 801, found: false },
+                    { x: 1616, y: 867, found: false },
+                    { x: 1512, y: 986, found: false },
+                    { x: 1390, y: 949, found: false },
+                    { x: 1065, y: 560, found: false }
+                ]
+            },
+            {
+                name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/17.png',
+                differences: [
+                    { x: 1250, y: 675, found: false },
+                    { x: 1106, y: 786, found: false },
+                    { x: 1461, y: 923, found: false },
+                    { x: 1524, y: 779, found: false },
+                    { x: 1623, y: 572, found: false }
+                ]
+            },
+            {
+                name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/18.png',
+                differences: [
+                    { x: 1409, y: 845, found: false },
+                    { x: 1568, y: 864, found: false },
+                    { x: 1686, y: 657, found: false },
+                    { x: 1331, y: 664, found: false },
+                    { x: 1039, y: 564, found: false }
+                ]
+            },
+            {
+                name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/19.png',
+                differences: [
+                    { x: 1609, y: 879, found: false },
+                    { x: 1472, y: 941, found: false },
+                    { x: 1268, y: 856, found: false },
+                    { x: 1076, y: 908, found: false },
+                    { x: 1128, y: 749, found: false }
+                ]
+            },
+            {
+                name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/20.png',
+                differences: [
+                    { x: 1642, y: 871, found: false },
+                    { x: 1405, y: 919, found: false },
+                    { x: 1505, y: 978, found: false },
+                    { x: 1239, y: 886, found: false },
+                    { x: 1172, y: 971, found: false }
+                ]
+            }
+        ];
+
+        // 隨機選擇一張圖片
+        function getRandomImage() {
+            const randomIndex = Math.floor(Math.random() * gameImages.length);
+            return gameImages[randomIndex];
+        }
+
+        const selectedImage = getRandomImage();
+        let differences = JSON.parse(JSON.stringify(selectedImage.differences)); // 深拷貝，避免修改原陣列
+        
+        const tolerance = 40;
+        let foundCount = 0;
+        const totalCount = differences.length;
+
+        // --- 遊戲邏輯 ---
+
+        const gameArea = document.getElementById('game-area');
+        const gameImg = document.getElementById('game-img');
+        const statusText = document.getElementById('status');
+        const countText = document.getElementById('found-count');
+
+        // 設定隨機選中的圖片
+        gameImg.src = selectedImage.name;
+
+        // 控制遊戲是否已開始
+        let gameStarted = false;
+        const introOverlay = document.getElementById('intro-overlay');
+        const startBtn = document.getElementById('start-btn');
+
+        startBtn.addEventListener('click', () => {
+            introOverlay.style.display = 'none';
+            gameArea.classList.remove('hidden');
+            gameStarted = true;
+        });
+
+        // 點擊事件監聽
+        gameImg.addEventListener('click', function(e) {
+            if (!gameStarted) return;
+            const rect = gameImg.getBoundingClientRect();
+            const scaleX = gameImg.naturalWidth / rect.width;
+            const scaleY = gameImg.naturalHeight / rect.height;
+            const clickX = (e.clientX - rect.left) * scaleX;
+            const clickY = (e.clientY - rect.top) * scaleY;
+            console.log(`座標紀錄: x: ${Math.round(clickX)}, y: ${Math.round(clickY)},`);
+            let hit = false;
+
+            differences.forEach(diff => {
+                if (diff.found) return;
+                const dist = Math.sqrt(Math.pow(clickX - diff.x, 2) + Math.pow(clickY - diff.y, 2));
+                if (dist < tolerance * scaleX) {
+                    hit = true;
+                    diff.found = true;
+                    foundCount++;
+                    countText.textContent = foundCount;
+                    drawCircle(diff.x, diff.y, scaleX, scaleY);
+                    if (foundCount === totalCount) {
+                        statusText.textContent = "恭喜過關！你的觀察力太強了！🏆";
+                        statusText.style.color = "#00ff00";
+                    }
+                }
+            });
+
+            if (!hit && foundCount < totalCount) {
+                console.log("沒點中...");
+            }
+        });
+
+        function drawCircle(x, y, scaleX, scaleY) {
+            const circle = document.createElement('div');
+            circle.classList.add('circle');
+            const displayX = x / scaleX;
+            const displayY = y / scaleY;
+            circle.style.left = displayX + 'px';
+            circle.style.top = displayY + 'px';
+            gameArea.appendChild(circle);
+        }
+    </script>
+// ...existing code...

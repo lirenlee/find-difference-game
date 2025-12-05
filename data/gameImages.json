@@ -1,0 +1,203 @@
+[
+  {
+    "name": "./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/1.png",
+    "differences": [
+      { "x": 1065, "y": 603, "found": false },
+      { "x": 1248, "y": 707, "found": false },
+      { "x": 1094, "y": 854, "found": false },
+      { "x": 1351, "y": 866, "found": false },
+      { "x": 1542, "y": 821, "found": false }
+    ]
+  },
+  {
+    "name": "./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/2.png",
+    "differences": [
+      { "x": 1341, "y": 830, "found": false },
+      { "x": 1086, "y": 798, "found": false },
+      { "x": 1241, "y": 664, "found": false },
+      { "x": 1078, "y": 569, "found": false },
+      { "x": 1258, "y": 939, "found": false }
+    ]
+  },
+  {
+    "name": "./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/3.png",
+    "differences": [
+      { "x": 1642, "y": 581, "found": false },
+      { "x": 1647, "y": 780, "found": false },
+      { "x": 1485, "y": 885, "found": false },
+      { "x": 1141, "y": 791, "found": false },
+      { "x": 1086, "y": 602, "found": false }
+    ]
+  },
+    {
+        "name": "./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/4.png",
+        "differences": [
+        { "x": 1303, "y": 612, "found": false },
+        { "x": 1123, "y": 718, "found": false },
+        { "x": 1405, "y": 847, "found": false },
+        { "x": 1583, "y": 907, "found": false },
+        { "x": 1702, "y": 752, "found": false }
+        ]
+    },
+    {
+        "name": "./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/5.png",
+        "differences": [
+        { "x": 1380, "y": 950, "found": false },
+        { "x": 1145, "y": 843, "found": false },
+        { "x": 1136, "y": 698, "found": false },
+        { "x": 1315, "y": 717, "found": false },
+        { "x": 1519, "y": 845, "found": false }
+        ]
+    },
+    {
+        "name": "./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/6.png",
+        "differences": [
+        { "x": 1580, "y": 771, "found": false },
+        { "x": 1641, "y": 540, "found": false },
+        { "x": 1059, "y": 590, "found": false },
+        { "x": 1242, "y": 700, "found": false },
+        { "x": 1087, "y": 820, "found": false }
+        ]
+    },
+    {
+        "name": "./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/7.png",
+        "differences": [
+        { "x": 1068, "y": 601, "found": false },
+        { "x": 1329, "y": 834, "found": false },
+        { "x": 1136, "y": 926, "found": false },
+        { "x": 1449, "y": 973, "found": false },
+        { "x": 1531, "y": 867, "found": false }
+        ]
+    },
+    {
+        "name": "./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/8.png",
+        "differences": [
+        { "x": 1185, "y": 653, "found": false },
+        { "x": 1330, "y": 764, "found": false },
+        { "x": 1480, "y": 875, "found": false },
+        { "x": 1630, "y": 942, "found": false },
+        { "x": 1780, "y": 786, "found": false }
+        ]
+    },
+    {
+        "name": "./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/9.png",
+        "differences": [
+        { "x": 1195, "y": 663, "found": false },
+        { "x": 1340, "y": 774, "found": false },
+        { "x": 1490, "y": 885, "found": false },
+        { "x": 1640, "y": 952, "found": false },
+        { "x": 1790, "y": 796, "found": false }
+        ]
+    },
+    
+    {
+                "name": "./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/10.png",
+                "differences": [
+                    { "x": 1069, "y": 897, "found": false },
+                    { "x": 1169, "y": 749, "found": false },
+                    { "x": 1398, "y": 842, "found": false },
+                    { "x": 1501, "y": 923, "found": false },
+                    { "x": 1272, "y": 938, "found": false }
+                ]
+            },
+            {
+                "name": "./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/11.png",
+                "differences": [
+                    { "x": 1538, "y": 805, "found": false },
+                    { "x": 1102, "y": 827, "found": false },
+                    { "x": 1649, "y": 908, "found": false },
+                    { "x": 1633, "y": 730, "found": false },
+                    { "x": 1453, "y": 967, "found": false }
+                ]
+            },
+            {
+                "name": "./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/12.png",
+                "differences": [
+                    { "x": 1080, "y": 904, "found": false },
+                    { "x": 1054, "y": 753, "found": false },
+                    { "x": 1524, "y": 882, "found": false },
+                    { "x": 1671, "y": 853, "found": false },
+                    { "x": 1206, "y": 978, "found": false }
+                ]
+            },
+            {
+                "name": "./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/13.png",
+                "differences": [
+                    { "x": 1183, "y": 749, "found": false },
+                    { "x": 1217, "y": 919, "found": false },
+                    { "x": 1405, "y": 975, "found": false },
+                    { "x": 1420, "y": 834, "found": false },
+                    { "x": 1538, "y": 923, "found": false }
+                ]
+            },
+            {
+                "name": "./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/14.png",
+                "differences": [
+                    { "x": 1561, "y": 819, "found": false },
+                    { "x": 1520, "y": 956, "found": false },
+                    { "x": 1224, "y": 734, "found": false },
+                    { "x": 1061, "y": 638, "found": false },
+                    { "x": 1631, "y": 616, "found": false }
+                ]
+            },
+            {
+                "name": "./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/15.png",
+                "differences": [
+                    { "x": 1191, "y": 642, "found": false },
+                    { "x": 1065, "y": 745, "found": false },
+                    { "x": 1065, "y": 520, "found": false },
+                    { "x": 1420, "y": 964, "found": false },
+                    { "x": 1109, "y": 860, "found": false }
+                ]
+            },
+            {
+                "name": "./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/16.png",
+                "differences": [
+                    { "x": 1109, "y": 801, "found": false },
+                    { "x": 1616, "y": 867, "found": false },
+                    { "x": 1512, "y": 986, "found": false },
+                    { "x": 1390, "y": 949, "found": false },
+                    { "x": 1065, "y": 560, "found": false }
+                ]
+            },
+            {
+                "name": "./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/17.png",
+                "differences": [
+                    { "x": 1250, "y": 675, "found": false },
+                    { "x": 1106, "y": 786, "found": false },
+                    { "x": 1461, "y": 923, "found": false },
+                    { "x": 1524, "y": 779, "found": false },
+                    { "x": 1623, "y": 572, "found": false }
+                ]
+            },
+            {
+                "name": "./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/18.png",
+                "differences": [
+                    { "x": 1409, "y": 845, "found": false },
+                    { "x": 1568, "y": 864, "found": false },
+                    { "x": 1686, "y": 657, "found": false },
+                    { "x": 1331, "y": 664, "found": false },
+                    { "x": 1039, "y": 564, "found": false }
+                ]
+            },
+            {
+                "name": "./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/19.png",
+                "differences": [
+                    { "x": 1609, "y": 879, "found": false },
+                    { "x": 1472, "y": 941, "found": false },
+                    { "x": 1268, "y": 856, "found": false },
+                    { "x": 1076, "y": 908, "found": false },
+                    { "x": 1128, "y": 749, "found": false }
+                ]
+            },
+            {
+                "name": "./遊戲圖片-20251130T032810Z-1-001/遊戲圖片/20.png",
+                "differences": [
+                    { "x": 1642, "y": 871, "found": false },
+                    { "x": 1405, "y": 919, "found": false },
+                    { "x": 1505, "y": 978, "found": false },
+                    { "x": 1239, "y": 886, "found": false },
+                    { "x": 1172, "y": 971, "found": false }
+                ]
+            }
+]
