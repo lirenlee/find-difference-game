@@ -36,11 +36,11 @@
             {
                 name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/4.png',
                 differences: [
-                    { x: 1609, y: 668, found: false },
-                    { x: 1290, y: 759, found: false },
-                    { x: 1080, y: 698, found: false },
-                    { x: 1119, y: 881, found: false },
-                    { x: 1563, y: 863, found: false }
+                    { x: 1093, y: 697, found: false },
+                    { x: 1117, y: 875, found: false },
+                    { x: 1283, y: 758, found: false },
+                    { x: 1566, y: 860, found: false },
+                    { x: 1607, y: 678, found: false }
                 ]
             },
             {
@@ -76,21 +76,22 @@
             {
                 name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/8.png',
                 differences: [
-                    { x: 1139, y: 860, found: false },
-                    { x: 1287, y: 686, found: false },
-                    { x: 1261, y: 952, found: false },
-                    { x: 1494, y: 956, found: false },
-                    { x: 1546, y: 812, found: false }
+                    { x: 1142, y: 859, found: false },
+                    { x: 1259, y: 938, found: false },
+                    { x: 1502, y: 956, found: false },
+                    { x: 1550, y: 819, found: false },
+                    { x: 1290, y: 699, found: false }
                 ]
             },
             {
                 name: './遊戲圖片-20251130T032810Z-1-001/遊戲圖片/9.png',
                 differences: [
-                    { x: 1524, y: 801, found: false },
-                    { x: 1642, y: 904, found: false },
-                    { x: 1095, y: 842, found: false },
-                    { x: 1646, y: 716, found: false },
-                    { x: 1435, y: 967, found: false }
+                    { x: 1637, y: 717, found: false },
+                    { x: 1528, y: 811, found: false },
+                    { x: 1644, y: 920, found: false },
+                    { x: 1436, y: 966, found: false },
+                    { x: 1199, y: 924, found: false },
+                    { x: 1091, y: 837, found: false }  /* ← 新增第六個（範例） */
                 ]
             },
             {
@@ -224,6 +225,12 @@
         const gameImg = document.getElementById('game-img');
         const statusText = document.getElementById('status');
         const countText = document.getElementById('found-count');
+        // 確保 gameArea 為定位容器
+        if (gameArea) {
+            const s = window.getComputedStyle(gameArea);
+            if (s.position === 'static') gameArea.style.position = 'relative';
+            gameArea.style.boxSizing = 'border-box';
+        }
 
         // 設定隨機選中的圖片
         gameImg.src = selectedImage.name;
@@ -239,21 +246,32 @@
             gameStarted = true;
         });
 
-        // 點擊事件監聽
+        // 防短時間重複點擊
+        let _lastClickAt = 0;
+        // 點擊事件監聽（改為 for-loop，命中後立即跳出）
         gameImg.addEventListener('click', function(e) {
             if (!gameStarted) return;
+            const now = Date.now();
+            if (now - _lastClickAt < 200) return; // 忽略 200ms 內的重複事件
+            _lastClickAt = now;
+
             const rect = gameImg.getBoundingClientRect();
             const scaleX = gameImg.naturalWidth / rect.width;
             const scaleY = gameImg.naturalHeight / rect.height;
             const clickX = (e.clientX - rect.left) * scaleX;
             const clickY = (e.clientY - rect.top) * scaleY;
-            console.log(`座標紀錄: x: ${Math.round(clickX)}, y: ${Math.round(clickY)},`);
-            let hit = false;
+            console.log(`座標紀錄: x: ${Math.round(clickX)}, y: ${Math.round(clickY)}`);
 
-            differences.forEach(diff => {
-                if (diff.found) return;
-                const dist = Math.sqrt(Math.pow(clickX - diff.x, 2) + Math.pow(clickY - diff.y, 2));
-                if (dist < tolerance * scaleX) {
+            let hit = false;
+            // 以 for loop 找到第一個命中的 difference 就停止，避免畫出多個圈
+            for (let i = 0; i < differences.length; i++) {
+                const diff = differences[i];
+                if (diff.found) continue;
+                const dx = clickX - diff.x;
+                const dy = clickY - diff.y;
+                const dist = Math.hypot(dx, dy);
+                // tolerance 是以原始圖片像素為單位（clickX/clickY 與 diff.x/diff.y 都是 natural pixels）
+                if (dist < tolerance) {
                     hit = true;
                     diff.found = true;
                     foundCount++;
@@ -263,21 +281,48 @@
                         statusText.textContent = "恭喜過關！你的觀察力太強了！🏆";
                         statusText.style.color = "#00ff00";
                     }
+                    break; // 找到第一個就離開，避免同次點擊命中多個
                 }
-            });
+            }
 
             if (!hit && foundCount < totalCount) {
                 console.log("沒點中...");
             }
         });
 
-        function drawCircle(x, y, scaleX, scaleY) {
+        function drawCircle(x, y) {
+            // x,y = natural image coords
+            // 使用 getBoundingClientRect 確保考慮顯示大小與位置
+            const imgRect = gameImg.getBoundingClientRect();
+            const areaRect = gameArea.getBoundingClientRect();
+
+            if (!imgRect.width || !imgRect.height) return;
+
+            // 計算 scale 與顯示座標（相對於 image 左上）
+            const scale = imgRect.width / gameImg.naturalWidth;
+            const displayX = Math.round(x * scale);
+            const displayY = Math.round(y * (imgRect.height / gameImg.naturalHeight));
+
+            // image 相對於 gameArea 的偏移（viewport 座標差）
+            const offsetX = imgRect.left - areaRect.left;
+            const offsetY = imgRect.top - areaRect.top;
+
             const circle = document.createElement('div');
             circle.classList.add('circle');
-            const displayX = x / scaleX;
-            const displayY = y / scaleY;
-            circle.style.left = displayX + 'px';
-            circle.style.top = displayY + 'px';
+            Object.assign(circle.style, {
+                width: '30px',
+                height: '30px',
+                borderRadius: '50%',
+                background: 'rgba(255,0,0,0.12)',
+                border: '3px solid rgba(255,0,0,0.9)',
+                position: 'absolute',
+                left: (offsetX + displayX) + 'px',
+                top: (offsetY + displayY) + 'px',
+                transform: 'translate(-50%,-50%)',
+                pointerEvents: 'none',
+                zIndex: 9999
+            });
+
             gameArea.appendChild(circle);
         }
     </script>

@@ -235,6 +235,8 @@
                 const res = await fetch('./data/gameImages.json', { cache: "no-store" });
                 if (!res.ok) throw new Error('載入 data/gameImages.json 失敗: ' + res.status);
                 gameImages = await res.json();
+                // 過濾掉第9張（臨時）：
+                gameImages = gameImages.filter(g => !g.name.includes('/9.png'));
                 console.log('gameImages 載入完成，張數:', gameImages.length);
                 // 載入完成後啟動第一回合（顯示說明）
                 initNewRound(true);
@@ -253,11 +255,14 @@
         // 動態管理當前回合
         let selectedImage = null;
         let differences = [];
-        // 容許誤差（以原始圖片像素為單位）預設改為 120（可用下方 slider 微調）
-        let tolerance = 120;
-        let foundCount = 0;
-        let totalCount = 0;
-
+        // 容許誤差（以原始圖片像素為單位）
+        // 若你常常點到附近但距離小於 40px 建議使用 40~60
+        let tolerance = 40;
+        // 合併過近差異的閾值（若 JSON 裡兩個差異距離小於此值，會合併為一個）
+        const MERGE_THRESHOLD = 30;
+         let foundCount = 0;
+         let totalCount = 0;
+ 
         // --- 遊戲邏輯 ---
 
         const gameArea = document.getElementById('game-area');
@@ -286,25 +291,27 @@
         function initNewRound(showIntro = true) {
              selectedImage = getRandomImage();
              console.log('initNewRound -> selectedImage:', selectedImage && selectedImage.name);
+             // 深拷貝並合併過近的差異
              differences = JSON.parse(JSON.stringify(selectedImage.differences || []));
+             differences = mergeNearbyDifferences(differences, MERGE_THRESHOLD);
              console.log('differences (count):', differences.length, differences.slice(0,3));
-              foundCount = 0;
-              totalCount = differences.length;
-              countText.textContent = foundCount;
-              statusText.textContent = '';
-              // 移除畫面上既有的圈圈
-              document.querySelectorAll('.circle').forEach(n => n.remove());
-              // 設定圖片 src（瀏覽器會快取）
-              gameImg.src = selectedImage.name;
-              // 隱藏遊戲區或顯示說明視窗
-              gameArea.classList.add('hidden');
-              gameStarted = false;
-              if (showIntro) {
+               foundCount = 0;
+               totalCount = differences.length;
+               countText.textContent = foundCount;
+               statusText.textContent = '';
+               // 移除畫面上既有的圈圈
+               document.querySelectorAll('.circle').forEach(n => n.remove());
+               // 設定圖片 src（瀏覽器會快取）
+               gameImg.src = selectedImage.name;
+               // 隱藏遊戲區或顯示說明視窗
+               gameArea.classList.add('hidden');
+               gameStarted = false;
+               if (showIntro) {
                   introOverlay.style.display = 'flex';
-              } else {
+               } else {
                   introOverlay.style.display = 'none';
                   gameArea.classList.remove('hidden');
-              }
+               }
           }
  
          // 開始按鈕（說明視窗）
@@ -342,55 +349,78 @@
              if (sfxStart) { sfxStart.currentTime = 0; sfxStart.play().catch(()=>{}); }
          });
  
-         // 點擊事件監聽
+         // 合併彼此距離小於 threshold 的差異（回傳新的 differences）
+         function mergeNearbyDifferences(diffs, threshold) {
+             if (!Array.isArray(diffs) || diffs.length <= 1) return diffs || [];
+             const merged = [];
+             for (const d of diffs) {
+                 if (typeof d.x !== 'number' || typeof d.y !== 'number') continue;
+                 let found = false;
+                 for (const m of merged) {
+                     const dist = Math.hypot(d.x - m.x, d.y - m.y);
+                     if (dist <= threshold) {
+                         // 平均位置（加權）
+                         m.count = (m.count || 1) + 1;
+                         m.x = Math.round((m.x * (m.count - 1) + d.x) / m.count);
+                         m.y = Math.round((m.y * (m.count - 1) + d.y) / m.count);
+                         found = true;
+                         break;
+                     }
+                 }
+                 if (!found) merged.push({ x: d.x, y: d.y, found: false, count: 1 });
+             }
+             // 移除 count 屬性並確保 found=false
+             return merged.map(m => ({ x: m.x, y: m.y, found: false }));
+         }
+         // end mergeNearbyDifferences
+ 
+         // 點擊事件監聽（防抖，找到第一個命中就停止）
+         let _lastClickAt = 0;
          gameImg.addEventListener('click', function(e) {
             if (!gameStarted) return;
+            const now = Date.now();
+            if (now - _lastClickAt < 300) return;
+            _lastClickAt = now;
  
             // 取得顯示區塊與原始尺寸
             const rect = gameImg.getBoundingClientRect();
             const naturalW = gameImg.naturalWidth;
             const naturalH = gameImg.naturalHeight;
+            if (!naturalW || !naturalH) return;
  
             // 顯示 / 原始 的縮放比（x,y 各自計算以處理非等比縮放）
             const ratioX = rect.width / naturalW;
             const ratioY = rect.height / naturalH;
  
-            // 取得點擊在顯示座標（px）
+            // 取得點擊在顯示座標（px）並還原成原始圖片座標
             const clickDisplayX = e.clientX - rect.left;
             const clickDisplayY = e.clientY - rect.top;
- 
-            // 還原成原始圖片座標（natural image 的座標系）
             const clickX = clickDisplayX / ratioX;
             const clickY = clickDisplayY / ratioY;
             console.log(`座標紀錄: x: ${Math.round(clickX)}, y: ${Math.round(clickY)}`);
  
             let hit = false;
- 
-            // 逐一比對並記錄距離（方便除錯）
-            differences.forEach((diff, idx) => {
-                if (diff.found) return;
+            for (let idx = 0; idx < differences.length; idx++) {
+                const diff = differences[idx];
+                if (diff.found) continue;
                 const dist = Math.hypot(clickX - diff.x, clickY - diff.y);
                 console.log(`diff[${idx}] = (${diff.x},${diff.y}) dist=${Math.round(dist)}`);
-                // tolerance 是以原始圖片像素為單位（不用乘 ratio）
-                if (dist < tolerance) {
+                if (dist <= tolerance) {
                     hit = true;
                     diff.found = true;
                     foundCount++;
                     countText.textContent = foundCount;
-                    // 畫圈時把原始座標轉回顯示座標
                     drawCircle(diff.x, diff.y, ratioX, ratioY);
                     if (sfxCorrect) { sfxCorrect.currentTime = 0; sfxCorrect.play().catch(()=>{}); }
-                    if (foundCount === totalCount) {
-                        showEndOverlay();
-                    }
+                    if (foundCount === totalCount) showEndOverlay();
+                    break; // 第一個命中就停止
                 }
-            });
+            }
  
-             if (!hit && foundCount < totalCount) {
- 
+            if (!hit && foundCount < totalCount) {
                 console.log("沒點中...");
                 if (sfxWrong) { sfxWrong.currentTime = 0; sfxWrong.play().catch(()=>{}); }
-             }
+            }
          });
  
          function showEndOverlay() {
